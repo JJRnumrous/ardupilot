@@ -107,10 +107,10 @@ enum control_mode_t {
     THROW =        18,  // throw to launch mode using inertial/GPS system, no pilot input
     AVOID_ADSB =   19,  // automatic avoidance of obstacles in the macro scale - e.g. full-sized aircraft
     GUIDED_NOGPS = 20,  // guided mode but only accepts attitude and altitude
-    SMART_RTL =    21,  // SMART_RTL returns to home by retracing its steps
+    SMART_RTL =    24,  // SMART_RTL returns to home by retracing its steps
     FLOWHOLD  =    22,  // FLOWHOLD holds position with optical flow without rangefinder
     FOLLOW    =    23,  // follow attempts to follow another vehicle or ground station
-    VISION    =    24,  // MY CUSTOM class
+    VISION    =    21,  // MY CUSTOM class
 };
 
 enum mode_reason_t {
