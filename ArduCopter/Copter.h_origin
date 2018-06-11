@@ -1017,9 +1017,6 @@ private:
 #if !HAL_MINIMIZE_FEATURES && OPTFLOW == ENABLED
     ModeFlowHold mode_flowhold;
 #endif
-#if MODE_VISION_ENABLED == ENABLED
-    ModeVision mode_vision;
-#endif
 
     // mode.cpp
     Mode *mode_from_mode_num(const uint8_t mode);
