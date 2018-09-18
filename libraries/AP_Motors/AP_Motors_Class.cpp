@@ -25,6 +25,7 @@
 #include <GCS_MAVLink/GCS.h>
 
 extern const AP_HAL::HAL& hal;
+int arming_flag;
 
 // singleton instance
 AP_Motors *AP_Motors::_instance;
@@ -65,6 +66,7 @@ void AP_Motors::armed(bool arm)
 {
     if (_flags.armed != arm) {
         _flags.armed = arm;
+        arming_flag = arm;
         AP_Notify::flags.armed = arm;
         if (!arm) {
             save_params_on_disarm();

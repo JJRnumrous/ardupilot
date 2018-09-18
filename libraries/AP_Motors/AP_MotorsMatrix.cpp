@@ -20,6 +20,7 @@
  */
 #include <AP_HAL/AP_HAL.h>
 #include "AP_MotorsMatrix.h"
+#include "SITL/SIM_Gazebo.h"
 
 extern const AP_HAL::HAL& hal;
 
@@ -27,11 +28,16 @@ extern const AP_HAL::HAL& hal;
 void AP_MotorsMatrix::init(motor_frame_class frame_class, motor_frame_type frame_type)
 {
     // record requested frame class and type
-    _last_frame_class = frame_class;
-    _last_frame_type = frame_type;
+//    _last_frame_class = frame_class;
+//    _last_frame_type = frame_type;
+
+        _last_frame_class = MOTOR_FRAME_QUAD;
+        _last_frame_type = MOTOR_FRAME_TYPE_X;
+
 
     // setup the motors
-    setup_motors(frame_class, frame_type);
+//    setup_motors(frame_class, frame_type);
+       setup_motors(MOTOR_FRAME_QUAD, MOTOR_FRAME_TYPE_X);
 
     // enable fast channels or instant pwm
     set_update_rate(_speed_hz);
@@ -113,6 +119,8 @@ void AP_MotorsMatrix::output_to_motors()
     for (i=0; i<AP_MOTORS_MAX_NUM_MOTORS; i++) {
         if (motor_enabled[i]) {
             rc_write(i, motor_out[i]);
+//            printf("motors %i\t%i", i,motor_out[i]);
+//                         printf("\n");
         }
     }
 }
@@ -133,6 +141,14 @@ uint16_t AP_MotorsMatrix::get_motor_mask()
 
 // output_armed - sends commands to the motors
 // includes new scaling stability patch
+
+// --> gets requested rpyt
+// --> does sanity checks
+// --> calculate what is minimum thrust per motor to keep in air at current attitude
+// --> scales roll pitch commands to add
+// --> adds yaw
+// --> adds adjective command thrust
+
 void AP_MotorsMatrix::output_armed_stabilizing()
 {
     uint8_t i;                          // general purpose counter
@@ -150,12 +166,27 @@ void AP_MotorsMatrix::output_armed_stabilizing()
     float   thr_adj;                    // the difference between the pilot's desired throttle and throttle_thrust_best_rpy
 
     // apply voltage and air pressure compensation
-    const float compensation_gain = get_compensation_gain();
+    // scaling using max_lift. causes more aggresive motor commands as voltage drops and lift reduces
+    const float compensation_gain = 1.0f;//get_compensation_gain();
     roll_thrust = _roll_in * compensation_gain;
     pitch_thrust = _pitch_in * compensation_gain;
     yaw_thrust = _yaw_in * compensation_gain;
     throttle_thrust = get_throttle() * compensation_gain;
     throttle_avg_max = _throttle_avg_max * compensation_gain;
+    printf("out:\n %f \n %f \n %f \n %f \n %f \n",roll_thrust,pitch_thrust,yaw_thrust, throttle_thrust, throttle_avg_max);
+//    roll_thrust = 0.0;
+//    pitch_thrust = 0.0;
+//    yaw_thrust = 0.0;
+//    throttle_thrust = 0.25;
+//    throttle_avg_max = 0.25;
+//
+//    if (time_stmp < 60.0){
+//        throttle_thrust = 0.25;
+//        throttle_avg_max = 0.25;
+//    }else{
+//        throttle_thrust = 0.5;
+//        throttle_avg_max = 0.5;
+//    }
 
     // sanity check throttle is above zero and below current limited throttle
     if (throttle_thrust <= 0.0f) {
@@ -181,6 +212,7 @@ void AP_MotorsMatrix::output_armed_stabilizing()
 
     // calculate amount of yaw we can fit into the throttle range
     // this is always equal to or less than the requested yaw from the pilot or rate controller
+
 
     throttle_thrust_best_rpy = MIN(0.5f, throttle_avg_max);
 

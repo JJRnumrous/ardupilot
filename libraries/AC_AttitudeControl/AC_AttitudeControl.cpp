@@ -500,6 +500,7 @@ void AC_AttitudeControl::input_rate_bf_roll_pitch_yaw_3(float roll_rate_bf_cds, 
 // Used to command a step in angle without exciting the orthogonal axis during autotune
 void AC_AttitudeControl::input_angle_step_bf_roll_pitch_yaw(float roll_angle_step_bf_cd, float pitch_angle_step_bf_cd, float yaw_angle_step_bf_cd)
 {
+    printf("%0.4f %0.4f %0.4f\n", get_rate_yaw_pid().kP().get(),get_rate_yaw_pid().kI().get(),get_rate_yaw_pid().kD().get());
     // Convert from centidegrees on public interface to radians
     float roll_step_rads = radians(roll_angle_step_bf_cd*0.01f);
     float pitch_step_rads = radians(pitch_angle_step_bf_cd*0.01f);

@@ -206,6 +206,7 @@ void AC_AttitudeControl_Multi::set_throttle_out(float throttle_in, bool apply_an
     }
     _motors.set_throttle(throttle_in);
     _motors.set_throttle_avg_max(get_throttle_avg_max(MAX(throttle_in, _throttle_in)));
+//    printf("avg: %f %f %f \n",get_throttle_avg_max(MAX(throttle_in, _throttle_in)),throttle_in, _throttle_in);
 }
 
 // returns a throttle including compensation for roll/pitch angle
@@ -256,8 +257,8 @@ void AC_AttitudeControl_Multi::rate_controller_run()
     update_throttle_rpy_mix();
 
     Vector3f gyro_latest = _ahrs.get_gyro_latest();
-    _motors.set_roll(rate_target_to_motor_roll(gyro_latest.x, _rate_target_ang_vel.x));
-    _motors.set_pitch(rate_target_to_motor_pitch(gyro_latest.y, _rate_target_ang_vel.y));
+    //_motors.set_roll(rate_target_to_motor_roll(gyro_latest.x, _rate_target_ang_vel.x));
+    //_motors.set_pitch(rate_target_to_motor_pitch(gyro_latest.y, _rate_target_ang_vel.y));
     _motors.set_yaw(rate_target_to_motor_yaw(gyro_latest.z, _rate_target_ang_vel.z));
 
     control_monitor_update();

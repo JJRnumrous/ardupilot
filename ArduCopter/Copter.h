@@ -623,6 +623,8 @@ private:
     // set when we are upgrading parameters from 3.4
     bool upgrading_frame_params;
     
+    AP_HAL::Util::perf_counter_t _motors_output_perf;
+
     static const AP_Scheduler::Task scheduler_tasks[];
     static const AP_Param::Info var_info[];
     static const struct LogStructure log_structure[];

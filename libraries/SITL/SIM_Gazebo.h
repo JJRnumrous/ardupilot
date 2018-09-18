@@ -21,6 +21,11 @@
 #include "SIM_Aircraft.h"
 #include <AP_HAL/utility/Socket.h>
 
+extern double time_stmp;
+extern double z_acc_glb;
+extern double z_vel_glb;
+extern double z_pos_glb;
+
 namespace SITL {
 
 /*
@@ -40,6 +45,13 @@ public:
 
     /*  Create and set in/out socket for Gazebo simulator */
     void set_interface_ports(const char* address, const int port_in, const int port_out);
+
+//    void set_stamp(double tm_st){time_stmp = tm_st; };
+//    double get_stamp(){return time_stmp;};
+
+protected:
+//    double time_stmp;
+
 
 private:
     /*
@@ -61,6 +73,7 @@ private:
       double velocity_xyz[3];
       double position_xyz[3];
     };
+
 
     void recv_fdm(const struct sitl_input &input);
     void send_servos(const struct sitl_input &input);

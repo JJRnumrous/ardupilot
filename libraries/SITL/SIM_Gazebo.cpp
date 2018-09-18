@@ -17,13 +17,27 @@
 */
 
 #include "SIM_Gazebo.h"
+#include <../ArduCopter/Copter.h>
+#include <AP_Motors/AP_Motors_Class.h>
 
 #include <stdio.h>
 #include <errno.h>
 
 #include <AP_HAL/AP_HAL.h>
 
+/*
+ * required to write to file
+ */
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+
 extern const AP_HAL::HAL& hal;
+double time_stmp;
+double z_acc_glb;
+double z_vel_glb;
+double z_pos_glb;
 
 namespace SITL {
 
@@ -36,6 +50,12 @@ Gazebo::Gazebo(const char *home_str, const char *frame_str) :
     // Gazebo keeps sending us packets. Not strictly necessary but
     // useful for debugging
     fprintf(stdout, "Starting SITL Gazebo\n");
+
+
+//    ofstream sendfile;
+//    sendfile.open ("../../Build/send.txt", ios::out);
+//    ofstream recfile;
+//    recfile.open ("../../Build/rec.txt", ios::out);
 }
 
 /*
@@ -63,12 +83,26 @@ void Gazebo::set_interface_ports(const char* address, const int port_in, const i
 void Gazebo::send_servos(const struct sitl_input &input)
 {
     servo_packet pkt;
+
+//    ofstream sendfile;
+//    sendfile.open ("../../Build/send.txt", ios::out | ios::app);
+//    sendfile << time_stmp;
+//    sendfile << "\t";
+
     // should rename servo_command
     // 16 because struct sitl_input.servos is 16 large in SIM_Aircraft.h
     for (unsigned i = 0; i < 16; ++i)
     {
       pkt.motor_speed[i] = (input.servos[i]-1000) / 1000.0f;
+      if(i==4){
+          pkt.motor_speed[i] = arming_flag;
+      }else if((i>4)&&(i<8)){
+          pkt.motor_speed[i] = time_stmp;
+      }
+//      sendfile << pkt.motor_speed[i];
+//      sendfile << "\t";
     }
+//    sendfile << "\n";
     socket_sitl.sendto(&pkt, sizeof(pkt), _gazebo_address, _gazebo_port);
 }
 
@@ -79,20 +113,21 @@ void Gazebo::send_servos(const struct sitl_input &input)
 void Gazebo::recv_fdm(const struct sitl_input &input)
 {
     fdm_packet pkt;
-
     /*
       we re-send the servo packet every 0.1 seconds until we get a
       reply. This allows us to cope with some packet loss to the FDM
      */
-    while (socket_sitl.recv(&pkt, sizeof(pkt), 100) != sizeof(pkt)) {
+    while (socket_sitl.recv(&pkt, sizeof(pkt), 1000) != sizeof(pkt)) {
         send_servos(input);
         // Reset the timestamp after a long disconnection, also catch gazebo reset
         if (get_wall_time_us() > last_wall_time_us + GAZEBO_TIMEOUT_US) {
             last_timestamp = 0;
         }
     }
-
+    time_stmp = pkt.timestamp;
     const double deltat = pkt.timestamp - last_timestamp;  // in seconds
+
+
     if (deltat < 0) {  // don't use old paquet
         time_now_us += 1;
         return;
@@ -122,6 +157,9 @@ void Gazebo::recv_fdm(const struct sitl_input &input)
                         static_cast<float>(pkt.position_xyz[2]));
 
 
+    z_acc_glb = (pkt.imu_linear_acceleration_xyz[2]);
+    z_vel_glb = pkt.velocity_xyz[2];
+    z_pos_glb = pkt.position_xyz[2];
     // auto-adjust to simulation frame rate
     time_now_us += static_cast<uint64_t>(deltat * 1.0e6);
 
@@ -130,6 +168,16 @@ void Gazebo::recv_fdm(const struct sitl_input &input)
     }
     last_timestamp = pkt.timestamp;
 
+//        ofstream recfile;
+//        recfile.open ("../../Build/rec.txt", ios::out | ios::app);
+//        recfile << pkt.timestamp;
+//        recfile << "\t";
+//        recfile << pkt.imu_linear_acceleration_xyz[0];
+//        recfile << "\t";
+//        recfile << pkt.imu_linear_acceleration_xyz[1];
+//        recfile << "\t";
+//        recfile << pkt.imu_linear_acceleration_xyz[2];
+//        recfile << "\n";
 }
 
 /*

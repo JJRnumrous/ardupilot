@@ -44,7 +44,7 @@
 
 class AC_AttitudeControl {
 public:
-    AC_AttitudeControl( AP_AHRS_View &ahrs,
+    AC_AttitudeControl( AP_AHRS_View &ahrs, // @suppress("Class members should be properly initialized")
                         const AP_Vehicle::MultiCopter &aparm,
                         AP_Motors& motors,
                         float dt) :

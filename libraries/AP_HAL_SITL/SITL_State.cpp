@@ -408,6 +408,7 @@ void SITL_State::_simulator_servos(SITL::Aircraft::sitl_input &input)
             input.servos[i] = 0;
         } else {
             input.servos[i] = pwm_output[i];
+
         }
     }
 

@@ -1213,6 +1213,18 @@ protected:
     const char *name() const override { return "VISION"; }
     const char *name4() const override { return "VIS"; }
 
+    void run_motors( uint32_t time_now);
+    void run_test_motors();
+    float run_nsa_controller(float target);
+    float run_climb_rate_cnt(float target);
+    float run_alt_controller(float target);
+    float run_yaw_rate_controller(float target);
+    float run_yaw_angle_controller(float target);
+    float run_pitch_rate_controller(float target);
+    float run_pitch_angle_controller(float target);
+    float run_roll_rate_controller(float target);
+    float run_roll_angle_controller(float target);
+
 private:
 
 };

@@ -44,6 +44,12 @@ class AC_PosControl
 {
 public:
 
+    /*
+     *  Design Controllers
+     */
+    void run_z_accel_controller(float target);
+    float run_z_vel_controller(float target);
+
     /// Constructor
     AC_PosControl(const AP_AHRS_View& ahrs, const AP_InertialNav& inav,
                   const AP_Motors& motors, AC_AttitudeControl& attitude_control);
@@ -146,7 +152,7 @@ public:
     bool is_active_z() const;
 
     /// update_z_controller - fly to altitude in cm above home
-    void update_z_controller();
+    float update_z_controller(); // added float
 
     // get_leash_down_z, get_leash_up_z - returns vertical leash lengths in cm
     float get_leash_down_z() const { return _leash_down_z; }
@@ -330,7 +336,8 @@ protected:
     //          set_alt_target
     //          set_target_to_stopping_point_z
     //          init_takeoff
-    void run_z_controller();
+    float run_z_controller();   // added float and curr_alt as return
+
 
     ///
     /// xy controller private methods

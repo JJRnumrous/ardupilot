@@ -170,7 +170,9 @@ protected:
     uint8_t instance;
     const char *autotest_dir;
     const char *frame;
-    bool use_time_sync = true;
+    //
+    bool use_time_sync = false;//true
+    //
     float last_speedup = -1.0f;
 
     // allow for AHRS_ORIENTATION

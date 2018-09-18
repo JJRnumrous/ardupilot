@@ -72,7 +72,7 @@
  *  Requires modified version of Arduino, which can be found here: http://ardupilot.com/downloads/?category=6
  *
  */
-
+#include "SITL/SIM_Gazebo.h"
 #include "Copter.h"
 
 #define SCHED_TASK(func, rate_hz, max_time_micros) SCHED_TASK_CLASS(Copter, &copter, func, rate_hz, max_time_micros)
@@ -206,6 +206,7 @@ void Copter::setup()
 
     // initialise the main loop scheduler
     scheduler.init(&scheduler_tasks[0], ARRAY_SIZE(scheduler_tasks), MASK_LOG_PM);
+    _motors_output_perf = hal.util->perf_alloc(AP_HAL::Util::PC_ELAPSED, "motors_output");
 }
 
 void Copter::loop()
@@ -218,6 +219,8 @@ void Copter::loop()
 // Main loop - 400hz
 void Copter::fast_loop()
 {
+    printf("%f\n",time_stmp);
+
     // update INS immediately to get current gyro data populated
     ins.update();
 
@@ -225,7 +228,9 @@ void Copter::fast_loop()
     attitude_control->rate_controller_run();
 
     // send outputs to the motors library immediately
-    motors_output();
+    hal.util->perf_begin(_motors_output_perf);
+        motors_output();
+    hal.util->perf_end(_motors_output_perf);
 
     // run EKF state estimator (expensive)
     // --------------------

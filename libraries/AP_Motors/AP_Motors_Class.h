@@ -25,6 +25,8 @@
 // motor update rate
 #define AP_MOTORS_SPEED_DEFAULT     490 // default output rate to the motors
 
+extern int arming_flag;
+
 /// @class      AP_Motors
 class AP_Motors {
 public:

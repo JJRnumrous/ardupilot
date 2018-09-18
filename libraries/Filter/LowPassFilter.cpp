@@ -20,6 +20,7 @@ DigitalLPF<T>::DigitalLPF() {
 // add a new raw value to the filter, retrieve the filtered result
 template <class T>
 T DigitalLPF<T>::apply(const T &sample, float cutoff_freq, float dt) {
+    printf("sample: %f \n cuttof: %f \n",sample, cutoff_freq);
     if (cutoff_freq <= 0.0f || dt <= 0.0f) {
         _output = sample;
         return _output;
